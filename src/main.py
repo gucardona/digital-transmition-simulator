@@ -1,6 +1,7 @@
 import data as data
 import encoder as encoder
 import modulator as modulator
+import utils as utils
 
 def main():
     message = "o"
@@ -13,37 +14,19 @@ def main():
     print(f"\nMensagem ASCII recuperada: '{recovered_message}'")
 
 
-    # Encoders
-    ami_encoder = encoder.AMIBipolarEncoder()
-    encoded_signal = ami_encoder.encode(data_bits)
-    print(f"\nSinal AMI Bipolar codificado: {encoded_signal}")
-    # encoder.plot_encoding(data_bits, encoded_signal, 'AMI Bipolar')
+    # Seleciona e aplica o encoder. 1: Manchester, 2: AMI Bipolar
+    selected_encoder = utils.select_encoder(1)
+    encoded_signal = selected_encoder.encode(data_bits)
+    encoder_name = selected_encoder.__class__.__name__.replace('Encoder', '')
+    print(f"\nSinal {encoder_name} codificado: {encoded_signal}")
+    encoder.plot_encoding(data_bits, encoded_signal, encoder_name)
 
-    manchester_encoder = encoder.ManchesterEncoder()
-    encoded_signal = manchester_encoder.encode(data_bits)
-    print(f"\nSinal Manchester codificado: {encoded_signal}")
-    # encoder.plot_encoding(data_bits, manchester_encoder, 'Manchester')
-
-    # Modulators
-    bpsk_modulator = modulator.BPSKModulator()
-    modulated_signal = bpsk_modulator.modulate(encoded_signal)
-    print(f"\nSinal modulado BPSK: {modulated_signal}")
-    # modulator.plot_constellation(bpsk_modulator)
-
-    qpsk_modulator = modulator.QPSKModulator()
-    modulated_signal = qpsk_modulator.modulate(encoded_signal)
-    print(f"\nSinal modulado QPSK: {modulated_signal}")
-    # modulator.plot_constellation(qpsk_modulator)
-
-    qam16_modulator = modulator.QAM16Modulator()
-    modulated_signal = qam16_modulator.modulate(encoded_signal)
-    print(f"\nSinal modulado 16-QAM: {modulated_signal}")
-    # modulator.plot_constellation(qam16_modulator)   
-
-    qam64_modulator = modulator.QAM64Modulator()
-    modulated_signal = qam64_modulator.modulate(encoded_signal)
-    print(f"\nSinal modulado 64-QAM: {modulated_signal}")
-    # modulator.plot_constellation(qam64_modulator)
+    # Seleciona e aplica o modulador. 1: BPSK, 2: QPSK, 3: 16-QAM, 4: 64-QAM
+    selected_modulator = utils.select_modulator(4)
+    modulated_signal = selected_modulator.modulate(encoded_signal)
+    modulator_name = selected_modulator.__class__.__name__.replace('Modulator', '')
+    print(f"\nSinal modulado {modulator_name}: {modulated_signal}")
+    modulator.plot_constellation(selected_modulator)
 
 
 if __name__ == "__main__":
