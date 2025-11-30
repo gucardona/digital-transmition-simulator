@@ -1,6 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+class BPSKModulator:
+    """BPSK: 1 bit por símbolo"""
+    
+    def __init__(self):
+        self.constellation = {
+            (0,): 1.0,   # Fase 0°
+            (1,): -1.0   # Fase 180°
+        }
+    
+    def modulate(self, signal: np.ndarray) -> np.ndarray:
+        """Modula usando BPSK"""
+        # Converte -1,+1 para 0,1
+        bits = ((signal + 1) / 2).astype(int)
+        
+        modulated = np.zeros(len(bits))
+        for i, bit in enumerate(bits):
+            modulated[i] = self.constellation[(bit,)]
+        
+        return modulated
+
 class QPSKModulator:
     """
     QPSK: 2 bits por símbolo
@@ -44,6 +64,47 @@ class QPSKModulator:
             modulated[i] = self.constellation[bit_pair]
         
         return modulated
+
+
+class QAM16Modulator:
+    """16-QAM: 4 bits por símbolo"""
+    
+    def __init__(self):
+        # Constelação 16-QAM (4x4 = 16 pontos)
+        self.constellation = {}
+        
+        # Amplitudes: -3, -1, +1, +3
+        positions = [-3, -1, 1, 3]
+        
+        index = 0
+        for i in positions:
+            for q in positions:
+                # Converte índice (0-15) para 4 bits
+                bits = tuple([int(x) for x in format(index, '04b')])
+                self.constellation[bits] = complex(i, q)
+                index += 1
+    
+    def modulate(self, signal: np.ndarray) -> np.ndarray:
+        """Modula usando 16-QAM"""
+        # Padding para múltiplo de 4
+        pad_length = (4 - len(signal) % 4) % 4
+        if pad_length > 0:
+            signal = np.append(signal, np.zeros(pad_length))
+        
+        # Converte -1,+1 para 0,1
+        bits = ((signal + 1) / 2).astype(int)
+        
+        # Agrupa de 4 em 4
+        num_symbols = len(bits) // 4
+        modulated = np.zeros(num_symbols, dtype=complex)
+        
+        for i in range(num_symbols):
+            bit_group = tuple(bits[i*4:(i+1)*4])
+            modulated[i] = self.constellation[bit_group]
+        
+        # Normalização
+        return modulated / np.sqrt(10)
+
 
 class QAM64Modulator:
     """

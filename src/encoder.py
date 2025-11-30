@@ -35,85 +35,159 @@ class ManchesterEncoder:
 
         return encoded
     
-    def plot(bits, encoded_signal):
+class AMIBipolarEncoder:
+    """Codificação AMI Bipolar"""
+    
+    def __init__(self):
+        self.last_one_level = -1  # Começa em -1, primeiro será +1
+    
+    def encode(self, bits: np.ndarray) -> np.ndarray:
         """
-        Plota codificação Manchester de forma super didática
-        Mostra claramente as transições no meio de cada bit
+        Codifica usando AMI Bipolar
+        
+        Bit 0 → 0
+        Bit 1 → alterna entre +1 e -1
         """
-        
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8))
-        ax1.set_title("Bits Originais", fontsize=14, fontweight='bold')
-        
-        # Criar forma de onda quadrada para os bits
-        time_bits = []
-        signal_bits = []
+        encoded = np.zeros(len(bits))
+        self.last_one_level = -1  # Reset
         
         for i, bit in enumerate(bits):
-            # Cada bit ocupa 2 unidades de tempo
-            time_bits.extend([i*2, i*2+2])
-            signal_bits.extend([bit, bit])
+            if bit == 0:
+                # Bit 0: sempre zero
+                encoded[i] = 0
+            else:
+                # Bit 1: alterna polaridade
+                self.last_one_level *= -1  # -1 vira +1, +1 vira -1
+                encoded[i] = self.last_one_level
         
-        ax1.plot(time_bits, signal_bits, 'b-', linewidth=2, drawstyle='steps-post')
-        ax1.set_ylim(-0.5, 1.5)
-        ax1.set_ylabel("Bit", fontsize=12)
-        ax1.grid(True, alpha=0.3)
-        ax1.set_yticks([0, 1])
-        
-        # Adiciona texto mostrando cada bit
-        for i, bit in enumerate(bits):
-            ax1.text(i*2 + 1, bit + 0.2, str(bit), 
-                    ha='center', va='bottom', fontsize=12, fontweight='bold')
-        
-        # Marca as divisões de bits
-        for i in range(len(bits) + 1):
-            ax1.axvline(i*2, color='red', linestyle='--', alpha=0.3)
-        
-        ax1.set_xlim(0, len(bits)*2)
-        ax2.set_title("Sinal Manchester Codificado", fontsize=14, fontweight='bold')
-        
-        # Criar forma de onda do sinal Manchester
-        time_manchester = []
-        signal_manchester = []
+        return encoded
+    
+
+def plot_encoding(bits, encoded_signal, encoder_name):
+    """
+    Plota codificação de qualquer encoder de forma didática
+    Detecta automaticamente o tipo de encoder
+    """
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8))
+    ax1.set_title("Bits Originais", fontsize=14, fontweight='bold')
+    
+    # Determina escala de tempo baseado no encoder
+    if encoder_name == "Manchester":
+        time_scale = 2  # Manchester: cada bit ocupa 2 unidades
+    else:
+        time_scale = 1  # NRZ/AMI: cada bit ocupa 1 unidade
+    
+    time_bits = []
+    signal_bits = []
+    
+    for i, bit in enumerate(bits):
+        time_bits.extend([i*time_scale, (i+1)*time_scale])
+        signal_bits.extend([bit, bit])
+    
+    ax1.plot(time_bits, signal_bits, 'b-', linewidth=2, drawstyle='steps-post')
+    ax1.set_ylim(-0.5, 1.5)
+    ax1.set_ylabel("Bit", fontsize=12)
+    ax1.grid(True, alpha=0.3)
+    ax1.set_yticks([0, 1])
+    
+    # Adiciona texto mostrando cada bit
+    for i, bit in enumerate(bits):
+        ax1.text(i*time_scale + time_scale/2, bit + 0.2, str(bit), 
+                ha='center', va='bottom', fontsize=12, fontweight='bold')
+    
+    # Marca as divisões de bits
+    for i in range(len(bits) + 1):
+        ax1.axvline(i*time_scale, color='red', linestyle='--', alpha=0.3)
+    
+    ax1.set_xlim(0, len(bits)*time_scale)
+    ax2.set_title(f"Sinal {encoder_name} Codificado", fontsize=14, fontweight='bold')
+    
+    # Criar forma de onda baseado no tipo de encoder
+    if encoder_name == "Manchester":
+        # Manchester: 2 samples por bit
+        time_encoded = []
+        signal_encoded = []
         
         for i in range(0, len(encoded_signal), 2):
-            # Cada bit Manchester tem 2 símbolos
             # Primeiro símbolo (primeira metade do bit)
-            time_manchester.extend([i, i+1])
-            signal_manchester.extend([encoded_signal[i], encoded_signal[i]])
+            time_encoded.extend([i, i+1])
+            signal_encoded.extend([encoded_signal[i], encoded_signal[i]])
             
             # Segundo símbolo (segunda metade do bit)
-            time_manchester.extend([i+1, i+2])
-            signal_manchester.extend([encoded_signal[i+1], encoded_signal[i+1]])
+            time_encoded.extend([i+1, i+2])
+            signal_encoded.extend([encoded_signal[i+1], encoded_signal[i+1]])
+    
+    else:
+        # NRZ/AMI: 1 sample por bit
+        time_encoded = []
+        signal_encoded = []
         
-        ax2.plot(time_manchester, signal_manchester, 'g-', linewidth=2.5, drawstyle='steps-post')
-        ax2.set_ylim(-1.5, 1.5)
-        ax2.set_ylabel("Nível de Sinal", fontsize=12)
-        ax2.set_xlabel("Tempo", fontsize=12)
-        ax2.grid(True, alpha=0.3)
-        ax2.set_yticks([-1, 0, 1])
-        ax2.axhline(0, color='black', linestyle='-', linewidth=0.5)
-        
-        # Marca as divisões de bits
-        for i in range(len(bits) + 1):
-            ax2.axvline(i*2, color='red', linestyle='--', alpha=0.3)
-        
-        # Adiciona anotações da transição
+        for i, value in enumerate(encoded_signal):
+            time_encoded.extend([i, i+1])
+            signal_encoded.extend([value, value])
+    
+    ax2.plot(time_encoded, signal_encoded, 'g-', linewidth=2.5, drawstyle='steps-post')
+    ax2.set_ylim(-1.5, 1.5)
+    ax2.set_ylabel("Nível de Sinal", fontsize=12)
+    ax2.set_xlabel("Tempo", fontsize=12)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_yticks([-1, 0, 1])
+    ax2.axhline(0, color='black', linestyle='-', linewidth=0.5)
+    
+    # Marca as divisões de bits
+    for i in range(len(bits) + 1):
+        ax2.axvline(i*time_scale, color='red', linestyle='--', alpha=0.3)
+    
+    # Adiciona anotações específicas por encoder
+    if encoder_name == "Manchester":
+        # Anotações de transição Manchester
         for i in range(len(bits)):
             bit_value = bits[i]
             transition = "LOW→HIGH" if bit_value == 0 else "HIGH→LOW"
-            ax2.text(i*2 + 1, 1.2, transition, 
+            ax2.text(i*time_scale + time_scale/2, 1.2, transition, 
                     ha='center', fontsize=9, 
                     bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.7))
-        
-        # Adiciona anotações mostrando qual bit está sendo representado
-        for i, bit in enumerate(bits):
-            ax2.text(i*2 + 1, -1.3, f"Bit {bit}", 
+            
+            ax2.text(i*time_scale + time_scale/2, -1.3, f"Bit {bit_value}", 
                     ha='center', fontsize=11, fontweight='bold',
                     bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
-        
-        ax2.set_xlim(0, len(bits)*2)
-        
-        plt.tight_layout()
-        plt.show()
-
-
+    
+    elif encoder_name == "AMIBipolar":
+        # Anotações AMI
+        for i, (bit, value) in enumerate(zip(bits, encoded_signal)):
+            if value == 0:
+                label = "0 (zero)"
+                color = 'gray'
+            elif value > 0:
+                label = "+1"
+                color = 'lightgreen'
+            else:
+                label = "-1"
+                color = 'lightcoral'
+            
+            ax2.text(i + 0.5, 1.2, f"Bit {bit}", 
+                    ha='center', fontsize=9, fontweight='bold',
+                    bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            
+            ax2.text(i + 0.5, -1.3, label, 
+                    ha='center', fontsize=9,
+                    bbox=dict(boxstyle='round', facecolor=color, alpha=0.7))
+    
+    elif encoder_name == "NRZ":
+        # Anotações NRZ
+        for i, (bit, value) in enumerate(zip(bits, encoded_signal)):
+            label = "+1" if value > 0 else "-1"
+            color = 'lightgreen' if value > 0 else 'lightcoral'
+            
+            ax2.text(i + 0.5, 1.2, f"Bit {bit}", 
+                    ha='center', fontsize=9, fontweight='bold',
+                    bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            
+            ax2.text(i + 0.5, -1.3, label, 
+                    ha='center', fontsize=9,
+                    bbox=dict(boxstyle='round', facecolor=color, alpha=0.7))
+    
+    ax2.set_xlim(0, len(bits)*time_scale)
+    
+    plt.tight_layout()
+    plt.show()
