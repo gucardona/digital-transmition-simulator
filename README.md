@@ -11,9 +11,9 @@
 
 ## Objetivo
 
-Este projeto visa desenvolver um simulador completo de um sistema de transmissão digital, permitindo a análise prática dos conceitos de **codificação de canal** e **modulação digital**. [cite\_start]O trabalho tem como meta analisar o impacto dessas técnicas na **Taxa de Erro de Bits (BER)** e na eficiência espectral de sistemas de comunicação[cite: 6].
+Este projeto visa desenvolver um simulador completo de um sistema de transmissão digital, permitindo a análise prática dos conceitos de **codificação de canal** e **modulação digital**. O trabalho tem como meta analisar o impacto dessas técnicas na **Taxa de Erro de Bits (BER)** e na eficiência espectral de sistemas de comunicação.
 
-[cite\_start]O simulador cobre o fluxo de comunicação desde a geração da mensagem até a transmissão, permitindo visualizar como os dados são transformados em cada etapa[cite: 7].
+O simulador cobre o fluxo de comunicação desde a geração da mensagem até a transmissão, permitindo visualizar como os dados são transformados em cada etapa.
 
 -----
 
@@ -23,7 +23,7 @@ Atualmente, o simulador cobre as etapas de transmissão do sistema (Itens 1, 2 e
 
 ### 1\. Geração de Dados (`src/data.py`)
 
-[cite\_start]Responsável por converter a informação humana em dados brutos para transmissão[cite: 19].
+Responsável por converter a informação humana em dados brutos para transmissão.
 
   * **Conversão ASCII para Binário:** Transforma strings de texto em vetores de bits, onde cada caractere é representado por 8 bits.
   * **Conversão Binário para ASCII:** Reverte o processo para verificar a integridade da mensagem.
@@ -31,7 +31,7 @@ Atualmente, o simulador cobre as etapas de transmissão do sistema (Itens 1, 2 e
 
 ### 2\. Codificação de Canal (`src/encoder.py`)
 
-[cite\_start]Implementa técnicas de codificação de linha para adequar o sinal ao meio de transmissão[cite: 20].
+Implementa técnicas de codificação de linha para adequar o sinal ao meio de transmissão.
 
   * **Manchester:** Divide cada bit em dois níveis de sinal (Low-High para '0', High-Low para '1').
   * **AMI Bipolar (Alternate Mark Inversion):** Utiliza três níveis de tensão (+1, 0, -1), alternando a polaridade nos bits '1' para evitar componente DC.
@@ -40,7 +40,7 @@ Atualmente, o simulador cobre as etapas de transmissão do sistema (Itens 1, 2 e
 
 ### 3\. Modulação Digital + Demodulação (`src/modulator.py`)
 
-[cite\_start]Mapeia os bits (ou sinais codificados) em símbolos complexos para transmissão em banda passante[cite: 21].
+Mapeia os bits (ou sinais codificados) em símbolos complexos para transmissão em banda passante.
 
   * **BPSK (Binary Phase Shift Keying):** 1 bit por símbolo.
   * **QPSK (Quadrature Phase Shift Keying):** 2 bits por símbolo.
@@ -157,7 +157,7 @@ Implementado em `noise.py`:
 ### 7\. Análise de Desempenho (BER) (Planejado)
 
   * Comparação bit a bit entre mensagem enviada e recebida.
-  * [cite\_start]Cálculo da Taxa de Erro de Bits (BER) e gráficos BER x SNR[cite: 23, 24].
+  * Cálculo da Taxa de Erro de Bits (BER) e gráficos BER x SNR.
 
 -----
 
