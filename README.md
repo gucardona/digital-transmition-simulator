@@ -160,21 +160,3 @@ Implementado em `noise.py`:
   * Cálculo da Taxa de Erro de Bits (BER) e gráficos BER x SNR.
 
 -----
-
-## Exemplos de Saída (Logs)
-
-Ao executar o código com a configuração padrão, você verá uma saída similar a esta no console:
-
-```text
-Mensagem ASCII: 'test message! longer than 8 bits'
-
-Mensagem binária: 01110100 01100101 ... 01110011
-
-Mensagem binária: 01101111
-
-Mensagem ASCII recuperada: 'o'
-
-Sinal Manchester codificado: [-1.  1.  1. -1.  1. -1. -1.  1.  1. -1.  1. -1.  1. -1.  1. -1.]
-
-Sinal modulado QAM64: [(-0.1543+0.1543j) (-0.1543-0.1543j) ...]
-```
