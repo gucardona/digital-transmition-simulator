@@ -4,7 +4,6 @@ import noise as noise
 import numpy as np
 from enum import IntEnum
 
-
 # Enums para seleção de esquemas (compatíveis com inteiros)
 class EncoderID(IntEnum):
     MANCHESTER = 1
