@@ -35,6 +35,24 @@ class ManchesterEncoder:
 
         return encoded
     
+    def decode(self, encoded_signal: np.ndarray) -> np.ndarray:
+        """
+        Decodifica um sinal Manchester em bits originais.
+        Regra (com limiar 0):
+        - Bit 0: primeira metade < segunda metade (LOW→HIGH)
+        - Bit 1: primeira metade > segunda metade (HIGH→LOW)
+        """
+        # Garantir que o comprimento seja par (2 amostras por bit)
+        n = len(encoded_signal) // 2
+        bits = np.zeros(n, dtype=int)
+        for i in range(n):
+            a = encoded_signal[2*i]
+            b = encoded_signal[2*i + 1]
+            # Limiares simples em 0 para robustez
+            # Decisão baseada na relação entre a e b
+            bits[i] = 0 if a < b else 1
+        return bits
+    
 class AMIBipolarEncoder:
     """Codificação AMI Bipolar"""
     
@@ -61,6 +79,17 @@ class AMIBipolarEncoder:
                 encoded[i] = self.last_one_level
         
         return encoded
+    
+    def decode(self, encoded_signal: np.ndarray) -> np.ndarray:
+        """
+        Decodifica AMI Bipolar:
+        - Valores próximos de 0 → bit 0
+        - Valores positivos/negativos → bit 1 (polaridade ignorada)
+        """
+        bits = np.zeros(len(encoded_signal), dtype=int)
+        for i, v in enumerate(encoded_signal):
+            bits[i] = 0 if abs(v) < 0.5 else 1
+        return bits
     
 
 def plot_encoding(bits, encoded_signal, encoder_name):
@@ -189,5 +218,21 @@ def plot_encoding(bits, encoded_signal, encoder_name):
     
     ax2.set_xlim(0, len(bits)*time_scale)
     
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_decoded_bits(bits: np.ndarray, encoder_name: str):
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(12, 2.5))
+    plt.step(range(len(bits)), bits, where='post', linewidth=2)
+    plt.ylim(-0.2, 1.2)
+    plt.title(f"Bits decodificados ({encoder_name})", fontsize=13, fontweight='bold')
+    plt.xlabel("Índice")
+    plt.ylabel("Bit")
+    plt.grid(True, alpha=0.3)
+    if len(bits) <= 64:
+        for i, b in enumerate(bits):
+            plt.text(i + 0.1, b + 0.15, str(b), fontsize=9, ha='center')
     plt.tight_layout()
     plt.show()

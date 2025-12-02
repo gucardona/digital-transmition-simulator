@@ -38,7 +38,7 @@ Atualmente, o simulador cobre as etapas de transmissão do sistema (Itens 1, 2 e
 
 **Visualização:** O sistema gera gráficos temporais mostrando os bits originais comparados com o sinal codificado resultante.
 
-### 3\. Modulação Digital (`src/modulator.py`)
+### 3\. Modulação Digital + Demodulação (`src/modulator.py`)
 
 [cite\_start]Mapeia os bits (ou sinais codificados) em símbolos complexos para transmissão em banda passante[cite: 21].
 
@@ -59,8 +59,9 @@ digital-transmission-simulator/
 ├── src/
 │   ├── data.py       # Manipulação de texto e conversão binária
 │   ├── encoder.py    # Algoritmos de codificação (Manchester, AMI) e plots
-│   ├── modulator.py  # Algoritmos de modulação (PSK, QAM) e plots
-│   ├── utils.py      # Seletores de classes e helpers
+│   ├── modulator.py  # Modulação + demodulação (PSK, QAM) e plots
+│   ├── noise.py      # Canal (AWGN)
+│   ├── utils.py      # Seletores (Encoder/Modulator/Noise) e helpers
 │   └── main.py       # Ponto de entrada e configuração da simulação
 │
 ├── .gitignore        # Arquivos ignorados pelo git
@@ -135,17 +136,25 @@ Após salvar as alterações no arquivo, execute novamente o comando `python src
 
 As seguintes funcionalidades estão planejadas para completar os requisitos do trabalho:
 
-### 4\. Simulação de Canal Ruidoso (AWGN)
+### 4\. Demodulação (Integrada nas Classes de Modulação)
 
-  * Adição de ruído gaussiano branco aditivo.
-  * [cite\_start]Controle da relação Sinal-Ruído (SNR)[cite: 22].
+Cada classe em `modulator.py` possui método `demodulate(received)` que:
+  * BPSK: decisão simples por sinal do eixo real.
+  * QPSK / QAM: decisão por distância mínima (nearest neighbor) revertendo normalização.
 
-### 5\. Demodulação e Decodificação
+Reconstituição dos níveis de linha para decodificação é feita por `utils.reconstruct_line_levels(...)` antes de chamar `encoder.decode`.
 
-  * Recuperação dos símbolos complexos ruidosos para bits.
-  * [cite\_start]Reversão da lógica Manchester/AMI[cite: 22].
+### 5\. Simulação de Canal Ruidoso (AWGN)
 
-### 6\. Análise de Desempenho (BER)
+Implementado em `noise.py`:
+  * Adição de ruído gaussiano branco aditivo conforme SNR.
+  * Plot da constelação com símbolos ruidosos sobrepostos.
+
+### 6\. Decodificação
+
+`encoder.decode` reverte Manchester (pares) ou AMI (polos alternados) após reconstrução.
+
+### 7\. Análise de Desempenho (BER) (Planejado)
 
   * Comparação bit a bit entre mensagem enviada e recebida.
   * [cite\_start]Cálculo da Taxa de Erro de Bits (BER) e gráficos BER x SNR[cite: 23, 24].
@@ -157,7 +166,9 @@ As seguintes funcionalidades estão planejadas para completar os requisitos do t
 Ao executar o código com a configuração padrão, você verá uma saída similar a esta no console:
 
 ```text
-Mensagem ASCII: 'o'
+Mensagem ASCII: 'test message! longer than 8 bits'
+
+Mensagem binária: 01110100 01100101 ... 01110011
 
 Mensagem binária: 01101111
 
