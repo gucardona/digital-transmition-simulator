@@ -27,7 +27,6 @@ def run_ber_snr_benchmark(
     Retorna: dict(label -> np.ndarray de BERs) e plota o gráfico.
     """
     if snr_list_db is None:
-        # Pontos espaçados: 0 a 30 dB com passo de 1 dB (para gráficos mais limpos)
         snr_list_db = np.arange(0.0, 30.0 + 1.0, 1.0)
 
     if combinations is None:
