@@ -3,8 +3,6 @@ import encoder as encoder
 import modulator as modulator
 import utils as utils
 import noise as noise
-import matplotlib.pyplot as plt
-import numpy as np
 from utils import EncoderID, ModulatorID, NoiseID
 
 def main():

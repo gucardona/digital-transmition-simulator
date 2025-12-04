@@ -138,7 +138,7 @@ class QAM64Modulator:
         if pad_length > 0:
             signal = np.append(signal, np.zeros(pad_length))
         
-        bits = _smart_signal_to_bits(signal) # <--- USO DA NOVA FUNÇÃO
+        bits = _smart_signal_to_bits(signal)
         
         num_symbols = len(bits) // 6
         modulated = np.zeros(num_symbols, dtype=complex)
