@@ -173,7 +173,7 @@ python src/benchmark_ber.py
 
 ### Gráfico Principal: BER vs SNR
 
-![BER vs SNR](caminho/para/grafico_ber_snr.png)
+![BER vs SNR](benchmark_result.png)
 
 **Configuração do teste:**
 - Mensagem: 10.000 caracteres (80.000 bits)

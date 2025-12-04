@@ -77,7 +77,7 @@ def run_ber_snr_benchmark(
     plt.ylabel('BER (Taxa de Erro de Bit)', fontsize=13, fontweight='bold')
     
     # Título com informações adicionais
-    title = f'BER vs SNR - {title_suffix}\n({len(message)} caracteres = {len(data_bits)} bits)'
+    title = f'BER vs SNR - {title_suffix}'
     plt.title(title, fontsize=14, fontweight='bold')
     
     plt.legend(loc='best', fontsize=9, ncol=2, framealpha=0.9)
@@ -97,7 +97,6 @@ if __name__ == "__main__":
     print("\n" + "="*70)
     print("BENCHMARK BER vs SNR")
     print("="*70)
-    print(f"\nMensagem: {len(message)} caracteres = {len(data.text_to_bits(message))} bits")
     print(f"{'─'*70}\n")
     
     # Configuração opcional de SNR e combinações
