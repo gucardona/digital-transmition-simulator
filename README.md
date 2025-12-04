@@ -179,7 +179,6 @@ python src/benchmark_ber.py
 - Mensagem: 10.000 caracteres (80.000 bits)
 - SNR: 0 a 30 dB (passos de 1 dB)
 - Total: 8 combinações testadas
-
 --- 
 
 ## Conclusão
@@ -190,7 +189,7 @@ python src/benchmark_ber.py
 ### Limitações do Simulador
 
 1. Apenas AWGN (ruído branco gaussiano)
-2. Sem códigos de correção de erro (FEC):
+2. Sem códigos de correção de erro (FEC)
 3. Sem overhead de protocolos
 4. SNR não varia
 
@@ -201,3 +200,9 @@ python src/benchmark_ber.py
 - Adicionar métricas de throughput efetivo
 
 ---
+
+### Referência de Comportamento
+
+![BER vs SNR](ref.png)
+
+> Salih, Sami & Al-Refai, Ali & Suliman, Mamoun & Mohammed, Abbas. (2013). Implementation of adaptive modulation for broadband wireless access networks using cognitive radio approaches. 345-349. 10.1109/ICCEEE.2013.6633960. 

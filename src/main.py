@@ -33,7 +33,7 @@ def main():
 
     noise_id = NoiseID.AWGN
     selected_noise = utils.select_noise(noise_id)
-    snr_db = 20  # Ajuste do SNR em dB conforme desejado
+    snr_db = 20  # ajuste do SNR em dB
     noisy_signal = selected_noise.aplicar(modulated_signal, snr_db)
     print(f"\nSinal modulado {modulator_name} com AWGN (SNR={snr_db} dB): {noisy_signal}")
     selected_noise.plot_constelacao_ruido(selected_modulator, noisy_signal, snr_db)
