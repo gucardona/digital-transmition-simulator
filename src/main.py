@@ -8,7 +8,7 @@ import numpy as np
 from utils import EncoderID, ModulatorID, NoiseID
 
 def main():
-    message = "test message! long message!"
+    message = "hello!"
     print(f"\nMensagem ASCII: '{message}'")
     
     data_bits = data.text_to_bits(message)
