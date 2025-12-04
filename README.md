@@ -191,7 +191,10 @@ https://github.com/user-attachments/assets/0ae3853b-68e3-46d8-909b-20e23bf6088a
 
 
 #### Demo - Encoder=AMI Bipolar, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
-tbd
+##### Um caractere (apenas um byte), para melhor visualização
+https://github.com/user-attachments/assets/525cfbee-10ee-4162-b6b1-7fce582762a6
+##### Uma frase (diversos bytes), para ver como ficaria a visualização
+https://github.com/user-attachments/assets/ba55733d-45bb-4c3e-9d08-708e02f8d388
 
 ---
 
