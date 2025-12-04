@@ -173,6 +173,8 @@ python src/benchmark_ber.py
 ##### Um caractere (apenas um byte), para melhor visualização
 https://github.com/user-attachments/assets/21171f99-2c10-433c-9226-b34db68c408c
 ##### Uma frase (diversos bytes), para ver como ficaria a visualização
+https://github.com/user-attachments/assets/76392037-8c7b-4c7f-b78e-afd91f21c2c0
+
 
 
 #### Demo - Encoder=Manchester, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
