@@ -3,12 +3,11 @@ import encoder as encoder
 import modulator as modulator
 import utils as utils
 import noise as noise
-import matplotlib.pyplot as plt
-import numpy as np
 from utils import EncoderID, ModulatorID, NoiseID
 
 def main():
-    message = "hello!"
+    message = "Olá, Cristiano Bonato Both! Como você está nesse dia ensolarado?"
+    # message = "a"
     print(f"\nMensagem ASCII: '{message}'")
     
     data_bits = data.text_to_bits(message)
@@ -41,6 +40,9 @@ def main():
     demod_bits = selected_modulator.demodulate(noisy_signal)
     print(f"\nBits demodulados: {demod_bits}")
     modulator.plot_demodulated_bits(demod_bits, modulator_name)
+
+    expected_len = len(data_bits) * 2 if encoder_name == "Manchester" else len(data_bits)
+    demod_bits = demod_bits[:expected_len]
 
     tx_mod_bits = utils.bits_for_modulation(encoded_signal, modulator_name)
     ber, errors, compared = utils.compute_ber(tx_mod_bits, demod_bits)

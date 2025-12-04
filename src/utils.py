@@ -47,48 +47,30 @@ def select_noise(noise_num: int | NoiseID) -> noise:
 
 
 def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_length: int | None = None) -> np.ndarray:
-    """
-    Parâmetros:
-    - bits_demod: sequência de bits (0/1) saída da demodulação.
-    - encoder_name: nome da classe de encoder (ex: 'Manchester').
-    - original_length: número de bits antes da codificação de linha. Necessário
-      para distinguir se 'bits_demod' já representam sub-bits Manchester.
-
-    Regras:
-    - Manchester:
-        * Se len(bits_demod) == 2 * original_length (sub-bits já em pares),
-          agrupa pares e reconstrói níveis (-1,+1) ou (+1,-1) sem duplicar.
-        * Caso contrário (não sabemos tamanho original), assume cada bit lógico
-          e expande (comportamento anterior).
-    - AMI Bipolar: 1 alterna polaridade (+1/-1), 0 -> 0 (sem expansão).
-    - Fallback NRZ: 0 -> -1, 1 -> +1.
-    """
     name = encoder_name.lower()
+    
     if name == "manchester":
-        if original_length is not None and len(bits_demod) == 2 * original_length:
-            # bits_demod contém sub-bits: cada par forma um bit Manchester
-            levels = []
-            for i in range(original_length):
-                a = bits_demod[2*i]
-                b = bits_demod[2*i + 1]
-                # map (0,1) -> [-1,+1]; (1,0) -> [+1,-1]
-                if a == 0 and b == 1:
-                    levels.extend([-1, +1])
-                elif a == 1 and b == 0:
-                    levels.extend([+1, -1])
-                else:
-                    # Par inválido (erro de demodulação); estratégia simples: marcar como transição de erro
-                    levels.extend([0, 0])
-            return np.array(levels)
-        else:
-            levels = []
-            for b in bits_demod:
-                if b == 0:
-                    levels.extend([-1, +1])
-                else:
-                    levels.extend([+1, -1])
-            return np.array(levels)
+        # Manchester SEMPRE trabalha em pares
+        # Não importa o tamanho, agrupe de 2 em 2
+        levels = []
+        for i in range(0, len(bits_demod), 2):
+            if i+1 >= len(bits_demod):
+                break  # Ímpar, ignora último
+            
+            a = bits_demod[i]
+            b = bits_demod[i + 1]
+            
+            if a == 0 and b == 1:
+                levels.extend([-1, +1])
+            elif a == 1 and b == 0:
+                levels.extend([+1, -1])
+            else:
+                levels.extend([0, 0])  # Erro de demodulação
+        
+        return np.array(levels)
+    
     elif name in ("amibipolar", "ami_bipolar", "ami"):
+        # AMI: mapeamento direto
         levels = []
         last_one = -1
         for b in bits_demod:
@@ -98,24 +80,27 @@ def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_
             else:
                 levels.append(0)
         return np.array(levels)
+    
     else:
+        # Fallback NRZ
         return np.where(bits_demod == 1, 1, -1).astype(int)
 
 
 def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
-    """Converte níveis de linha (-1,+1 ou -1,0,+1) em bits (0/1) e aplica
-    o mesmo padding esperado pelo modulador, para alinhar comprimento com os
-    bits demodulados.
-
-    Regras:
-    - BPSK: 1 bit por símbolo (sem padding além do original)
-    - QPSK: padding para múltiplos de 2
-    - 16-QAM: padding para múltiplos de 4
-    - 64-QAM: padding para múltiplos de 6
     """
-    name = modulator_name.lower()
-    bits = ((signal + 1) / 2).astype(int)
+    Converte níveis de linha em bits e aplica padding.
+    Agora suporta AMI Bipolar detectando zeros.
+    """
+    # Lógica inteligente de conversão (igual à do modulator.py)
+    if np.any(signal == 0):
+        # AMI: -1 e +1 são bit 1
+        bits = np.abs(signal).astype(int)
+    else:
+        # Manchester/NRZ: +1 é 1, -1 é 0
+        bits = ((signal + 1) / 2).astype(int)
 
+    name = modulator_name.lower()
+    
     if name == "bpsk":
         group = 1
     elif name == "qpsk":
@@ -125,7 +110,8 @@ def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
     elif name in ("qam64", "64qam", "64-qam"):
         group = 6
     else:
-        group = 1  # fallback
+        group = 1
+        
     pad_len = (group - (len(bits) % group)) % group
     if pad_len:
         bits = np.append(bits, np.zeros(pad_len, dtype=int))
