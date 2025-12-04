@@ -12,7 +12,7 @@ class BPSKModulator:
     
     def modulate(self, signal: np.ndarray) -> np.ndarray:
         """Modula usando BPSK"""
-        # Converte -1,+1 para 0,1
+        # converte -1,+1 para 0,1
         bits = ((signal + 1) / 2).astype(int)
         
         modulated = np.zeros(len(bits))
@@ -78,7 +78,7 @@ class QPSKModulator:
         Demodula QPSK por distância mínima aos pontos da constelação.
         Retorna bits agrupados sequencialmente.
         """
-        # Decisão por nearest-neighbor
+        # nearest-neighbor
         points = np.array(list(self.constellation.values()))
         bit_pairs = list(self.constellation.keys())
         bits_out = []

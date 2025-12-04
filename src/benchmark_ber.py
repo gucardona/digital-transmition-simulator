@@ -41,10 +41,9 @@ def run_ber_snr_benchmark(
             (EncoderID.AMI_BIPOLAR, ModulatorID.QAM64),
         ]
 
-    # Preparar dados e ruído
+
     data_bits = data.text_to_bits(message)
     awgn = utils.select_noise(NoiseID.AWGN)
-
     series = {}
     plt.figure(figsize=(14, 8))
 
@@ -55,7 +54,6 @@ def run_ber_snr_benchmark(
         modulator_name = mod.__class__.__name__.replace("Modulator", "")
         label = f"{encoder_name} + {modulator_name}"
 
-        # Codificar linha e preparar bits de referência para BER pós-modulação
         encoded_signal = enc.encode(data_bits)
         tx_mod_bits = utils.bits_for_modulation(encoded_signal, modulator_name)
 
@@ -69,20 +67,18 @@ def run_ber_snr_benchmark(
 
         ber_arr = np.array(ber_list)
         series[label] = ber_arr
-        # Linha contínua sem marcadores para leitura mais limpa
         plt.plot(snr_list_db, ber_arr, label=label, linewidth=2)
 
     plt.grid(True, alpha=0.3)
     plt.xlabel('SNR (dB)', fontsize=13, fontweight='bold')
     plt.ylabel('BER (Taxa de Erro de Bit)', fontsize=13, fontweight='bold')
     
-    # Título com informações adicionais
     title = f'BER vs SNR - {title_suffix}'
     plt.title(title, fontsize=14, fontweight='bold')
     
     plt.legend(loc='best', fontsize=9, ncol=2, framealpha=0.9)
-    plt.yscale('log')  # Escala logarítmica para melhor visualização do BER
-    plt.ylim(1e-5, 1)  # Limita o eixo Y entre 10⁻⁵ e 1
+    plt.yscale('log')
+    plt.ylim(1e-5, 1)
     plt.xlim(snr_list_db[0], snr_list_db[-1])
     plt.tight_layout()
     plt.show()
@@ -91,41 +87,18 @@ def run_ber_snr_benchmark(
 
 
 if __name__ == "__main__":
-    # Configuração da simulação
-    message = "A" * 10000  # Mensagem de 10000 caracteres
+    message = "A" * 10000  # msg de 10000 caracteres
     
     print("\n" + "="*70)
     print("BENCHMARK BER vs SNR")
     print("="*70)
     print(f"{'─'*70}\n")
     
-    # Configuração opcional de SNR e combinações
-    # Você pode descomentar e modificar estas linhas para personalizar
-    
-    # SNR personalizado (exemplo: menos pontos para execução mais rápida)
-    # custom_snr = np.arange(0.0, 25.0, 1.0)
-    
-    # Combinações personalizadas (exemplo: apenas algumas combinações)
-    # custom_combinations = [
-    #     (EncoderID.MANCHESTER, ModulatorID.BPSK),
-    #     (EncoderID.MANCHESTER, ModulatorID.QPSK),
-    #     (EncoderID.AMI_BIPOLAR, ModulatorID.BPSK),
-    #     (EncoderID.AMI_BIPOLAR, ModulatorID.QPSK),
-    # ]
-    
-    # Executar benchmark com configuração padrão
+    # executar benchmark com configuração padrão
     results = run_ber_snr_benchmark(
         message=message,
         title_suffix="Análise de Desempenho"
     )
-    
-    # Ou com configuração personalizada:
-    # results = run_ber_snr_benchmark(
-    #     message=message,
-    #     snr_list_db=custom_snr,
-    #     combinations=custom_combinations,
-    #     title_suffix="Análise de Desempenho"
-    # )
     
     print("\n" + "="*70)
     print("BENCHMARK CONCLUÍDO!")

@@ -12,16 +12,6 @@ class AWGNNoise:
     def aplicar(self, signal: np.ndarray, snr_db: float) -> np.ndarray:
         """
         Aplica AWGN ao `signal` com SNR em dB.
-
-        Entradas:
-        - signal: array NumPy de símbolos (real para BPSK, complexo para QPSK/QAM)
-        - snr_db: relação sinal-ruído desejada em dB (referente à potência média do sinal)
-
-        Saída:
-    - Sinal com ruído adicionado (mesmo dtype/shape do original)
-
-        Observações:
-    - Constelações QAM já normalizadas continuam assim; não há renormalização pós-ruído.
         """
         # Potência média do sinal
         if np.iscomplexobj(signal):

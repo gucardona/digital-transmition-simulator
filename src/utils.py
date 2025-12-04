@@ -4,7 +4,6 @@ import noise as noise
 import numpy as np
 from enum import IntEnum
 
-# Enums para seleção de esquemas (compatíveis com inteiros)
 class EncoderID(IntEnum):
     MANCHESTER = 1
     AMI_BIPOLAR = 2
@@ -18,9 +17,7 @@ class ModulatorID(IntEnum):
 class NoiseID(IntEnum):
     AWGN = 1
 
-
 def select_encoder(encoder_num: int | EncoderID) -> encoder:
-    """Seleciona o encoder baseado no número fornecido"""
     if int(encoder_num) == EncoderID.MANCHESTER:
         return encoder.ManchesterEncoder()
     elif int(encoder_num) == EncoderID.AMI_BIPOLAR:
@@ -30,7 +27,6 @@ def select_encoder(encoder_num: int | EncoderID) -> encoder:
 
 
 def select_modulator(modulator_num: int | ModulatorID) -> modulator:
-    """Seleciona o modulador baseado no número fornecido"""
     if int(modulator_num) == ModulatorID.BPSK:
         return modulator.BPSKModulator()
     elif int(modulator_num) == ModulatorID.QPSK:
@@ -44,7 +40,6 @@ def select_modulator(modulator_num: int | ModulatorID) -> modulator:
 
 
 def select_noise(noise_num: int | NoiseID) -> noise:
-    """Seleciona o modelo de ruído baseado no número fornecido"""
     if int(noise_num) == NoiseID.AWGN:
         return noise.AWGNNoise()
     else:
@@ -52,8 +47,7 @@ def select_noise(noise_num: int | NoiseID) -> noise:
 
 
 def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_length: int | None = None) -> np.ndarray:
-    """Reconstrói níveis de linha a partir de bits demodulados conforme o encoder.
-
+    """
     Parâmetros:
     - bits_demod: sequência de bits (0/1) saída da demodulação.
     - encoder_name: nome da classe de encoder (ex: 'Manchester').
@@ -77,7 +71,7 @@ def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_
             for i in range(original_length):
                 a = bits_demod[2*i]
                 b = bits_demod[2*i + 1]
-                # Mapear (0,1) -> [-1,+1]; (1,0) -> [+1,-1]
+                # map (0,1) -> [-1,+1]; (1,0) -> [+1,-1]
                 if a == 0 and b == 1:
                     levels.extend([-1, +1])
                 elif a == 1 and b == 0:
@@ -87,7 +81,6 @@ def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_
                     levels.extend([0, 0])
             return np.array(levels)
         else:
-            # Comportamento legado: tratar cada bit como lógico e expandir
             levels = []
             for b in bits_demod:
                 if b == 0:
@@ -109,10 +102,6 @@ def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_
         return np.where(bits_demod == 1, 1, -1).astype(int)
 
 
-## Demodulação agora é responsabilidade de cada classe em `modulator.py`.
-## Use: selected_modulator.demodulate(received_signal)
-
-
 def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
     """Converte níveis de linha (-1,+1 ou -1,0,+1) em bits (0/1) e aplica
     o mesmo padding esperado pelo modulador, para alinhar comprimento com os
@@ -125,9 +114,8 @@ def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
     - 64-QAM: padding para múltiplos de 6
     """
     name = modulator_name.lower()
-    # Mapear níveis para bits lógicos
     bits = ((signal + 1) / 2).astype(int)
-    # Determinar tamanho do grupo
+
     if name == "bpsk":
         group = 1
     elif name == "qpsk":
@@ -137,7 +125,7 @@ def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
     elif name in ("qam64", "64qam", "64-qam"):
         group = 6
     else:
-        group = 1  # Fallback conservador
+        group = 1  # fallback
     pad_len = (group - (len(bits) % group)) % group
     if pad_len:
         bits = np.append(bits, np.zeros(pad_len, dtype=int))
@@ -150,16 +138,14 @@ def compute_ber(tx_bits: np.ndarray, rx_bits: np.ndarray, original_length: int |
     Parâmetros:
     - tx_bits: bits transmitidos na etapa comparada (após mapeamento para bits de modulação).
     - rx_bits: bits recebidos demodulados na mesma etapa.
-    - original_length: opcional, para truncar comparação caso exista conhecimento do tamanho original (por exemplo, para ignorar bits extras em pipelines).
+    - original_length: opcional, para truncar comparação caso exista conhecimento do tamanho original
 
     Retorna:
     - (ber, errors, compared): taxa de erro, contagem de erros, número de bits comparados.
     """
-    # Garantir arrays 1D de ints
     tx_bits = np.asarray(tx_bits, dtype=int).flatten()
     rx_bits = np.asarray(rx_bits, dtype=int).flatten()
 
-    # Determinar comprimento de comparação
     n = min(len(tx_bits), len(rx_bits))
     if original_length is not None:
         n = min(n, int(original_length))
