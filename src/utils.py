@@ -87,19 +87,20 @@ def reconstruct_line_levels(bits_demod: np.ndarray, encoder_name: str, original_
 
 
 def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
-    """Converte níveis de linha (-1,+1 ou -1,0,+1) em bits (0/1) e aplica
-    o mesmo padding esperado pelo modulador, para alinhar comprimento com os
-    bits demodulados.
-
-    Regras:
-    - BPSK: 1 bit por símbolo (sem padding além do original)
-    - QPSK: padding para múltiplos de 2
-    - 16-QAM: padding para múltiplos de 4
-    - 64-QAM: padding para múltiplos de 6
     """
-    name = modulator_name.lower()
-    bits = ((signal + 1) / 2).astype(int)
+    Converte níveis de linha em bits e aplica padding.
+    Agora suporta AMI Bipolar detectando zeros.
+    """
+    # Lógica inteligente de conversão (igual à do modulator.py)
+    if np.any(signal == 0):
+        # AMI: -1 e +1 são bit 1
+        bits = np.abs(signal).astype(int)
+    else:
+        # Manchester/NRZ: +1 é 1, -1 é 0
+        bits = ((signal + 1) / 2).astype(int)
 
+    name = modulator_name.lower()
+    
     if name == "bpsk":
         group = 1
     elif name == "qpsk":
@@ -109,7 +110,8 @@ def bits_for_modulation(signal: np.ndarray, modulator_name: str) -> np.ndarray:
     elif name in ("qam64", "64qam", "64-qam"):
         group = 6
     else:
-        group = 1  # fallback
+        group = 1
+        
     pad_len = (group - (len(bits) % group)) % group
     if pad_len:
         bits = np.append(bits, np.zeros(pad_len, dtype=int))
