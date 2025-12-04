@@ -90,22 +90,33 @@ class QPSKModulator:
 
 
 class QAM16Modulator:
-    """16-QAM: 4 bits por símbolo"""
+    """16-QAM: 4 bits por símbolo com Gray coding"""
     
     def __init__(self):
-        # Constelação 16-QAM (4x4 = 16 pontos)
-        self.constellation = {}
-        
-        # Amplitudes: -3, -1, +1, +3
-        positions = [-3, -1, 1, 3]
-        
-        index = 0
-        for i in positions:
-            for q in positions:
-                # Converte índice (0-15) para 4 bits
-                bits = tuple([int(x) for x in format(index, '04b')])
-                self.constellation[bits] = complex(i, q)
-                index += 1
+        # Gray coding correto para 16-QAM
+        # Minimiza erros: símbolos vizinhos diferem em apenas 1 bit
+        self.constellation = {
+            # I=-3 column
+            (0, 0, 0, 0): complex(-3, -3),
+            (0, 0, 0, 1): complex(-3, -1),
+            (0, 0, 1, 1): complex(-3, 1),
+            (0, 0, 1, 0): complex(-3, 3),
+            # I=-1 column
+            (0, 1, 0, 0): complex(-1, -3),
+            (0, 1, 0, 1): complex(-1, -1),
+            (0, 1, 1, 1): complex(-1, 1),
+            (0, 1, 1, 0): complex(-1, 3),
+            # I=1 column
+            (1, 1, 0, 0): complex(1, -3),
+            (1, 1, 0, 1): complex(1, -1),
+            (1, 1, 1, 1): complex(1, 1),
+            (1, 1, 1, 0): complex(1, 3),
+            # I=3 column
+            (1, 0, 0, 0): complex(3, -3),
+            (1, 0, 0, 1): complex(3, -1),
+            (1, 0, 1, 1): complex(3, 1),
+            (1, 0, 1, 0): complex(3, 3),
+        }
     
     def modulate(self, signal: np.ndarray) -> np.ndarray:
         """Modula usando 16-QAM"""
@@ -129,9 +140,7 @@ class QAM16Modulator:
         return modulated / np.sqrt(10)
 
     def demodulate(self, received: np.ndarray) -> np.ndarray:
-        """
-        Demodula 16-QAM por distância mínima (com normalização correspondente).
-        """
+        """Demodula 16-QAM por distância mínima"""
         # Reverte normalização
         r = received * np.sqrt(10)
         points = np.array(list(self.constellation.values()))
@@ -143,24 +152,26 @@ class QAM16Modulator:
             bits_out.extend(bit_quads[idx])
         return np.array(bits_out, dtype=int)
 
-
 class QAM64Modulator:
-    """
-    64-QAM: 6 bits por símbolo
-    Usado em LTE, WiFi 5/6
-    """
+    """64-QAM: 6 bits por símbolo com Gray coding"""
     
     def __init__(self):
-        # Constelação 64-QAM (8x8)
+        # Gray coding para 64-QAM (8x8 grid)
+        # Padrão: primeiros 3 bits = I, últimos 3 bits = Q
         self.constellation = {}
+        
+        # Gray code para 3 bits: 000, 001, 011, 010, 110, 111, 101, 100
+        gray3 = [
+            (0,0,0), (0,0,1), (0,1,1), (0,1,0),
+            (1,1,0), (1,1,1), (1,0,1), (1,0,0)
+        ]
         positions = [-7, -5, -3, -1, 1, 3, 5, 7]
         
-        index = 0
-        for i in positions:
-            for q in positions:
-                bits = tuple([int(x) for x in format(index, '06b')])
-                self.constellation[bits] = complex(i, q)
-                index += 1
+        for i_idx, i_gray in enumerate(gray3):
+            for q_idx, q_gray in enumerate(gray3):
+                bits = i_gray + q_gray  # Concatena as tuplas
+                symbol = complex(positions[i_idx], positions[q_idx])
+                self.constellation[bits] = symbol
     
     def modulate(self, signal: np.ndarray) -> np.ndarray:
         """Similar ao 16-QAM, mas agrupa de 6 em 6 bits"""
@@ -176,12 +187,10 @@ class QAM64Modulator:
             bit_group = tuple(bits[i*6:(i+1)*6])
             modulated[i] = self.constellation[bit_group]
         
-        return modulated / np.sqrt(42)  # Normalização
+        return modulated / np.sqrt(42)
 
     def demodulate(self, received: np.ndarray) -> np.ndarray:
-        """
-        Demodula 64-QAM por distância mínima (com normalização correspondente).
-        """
+        """Demodula 64-QAM por distância mínima"""
         r = received * np.sqrt(42)
         points = np.array(list(self.constellation.values()))
         bit_groups = list(self.constellation.keys())
@@ -191,7 +200,55 @@ class QAM64Modulator:
             idx = np.argmin(d2)
             bits_out.extend(bit_groups[idx])
         return np.array(bits_out, dtype=int)
+
+class QAM64Modulator:
+    """64-QAM: 6 bits por símbolo com Gray coding"""
     
+    def __init__(self):
+        # Gray coding para 64-QAM (8x8 grid)
+        # Padrão: primeiros 3 bits = I, últimos 3 bits = Q
+        self.constellation = {}
+        
+        # Gray code para 3 bits: 000, 001, 011, 010, 110, 111, 101, 100
+        gray3 = [
+            (0,0,0), (0,0,1), (0,1,1), (0,1,0),
+            (1,1,0), (1,1,1), (1,0,1), (1,0,0)
+        ]
+        positions = [-7, -5, -3, -1, 1, 3, 5, 7]
+        
+        for i_idx, i_gray in enumerate(gray3):
+            for q_idx, q_gray in enumerate(gray3):
+                bits = i_gray + q_gray  # Concatena as tuplas
+                symbol = complex(positions[i_idx], positions[q_idx])
+                self.constellation[bits] = symbol
+    
+    def modulate(self, signal: np.ndarray) -> np.ndarray:
+        """Similar ao 16-QAM, mas agrupa de 6 em 6 bits"""
+        pad_length = (6 - len(signal) % 6) % 6
+        if pad_length > 0:
+            signal = np.append(signal, np.zeros(pad_length))
+        
+        bits = ((signal + 1) / 2).astype(int)
+        num_symbols = len(bits) // 6
+        modulated = np.zeros(num_symbols, dtype=complex)
+        
+        for i in range(num_symbols):
+            bit_group = tuple(bits[i*6:(i+1)*6])
+            modulated[i] = self.constellation[bit_group]
+        
+        return modulated / np.sqrt(42)
+
+    def demodulate(self, received: np.ndarray) -> np.ndarray:
+        """Demodula 64-QAM por distância mínima"""
+        r = received * np.sqrt(42)
+        points = np.array(list(self.constellation.values()))
+        bit_groups = list(self.constellation.keys())
+        bits_out = []
+        for s in r:
+            d2 = np.abs(s - points) ** 2
+            idx = np.argmin(d2)
+            bits_out.extend(bit_groups[idx])
+        return np.array(bits_out, dtype=int)
 
 def plot_constellation(modulator):
     """Plota constelação de qualquer modulador"""
