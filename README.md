@@ -175,15 +175,17 @@ https://github.com/user-attachments/assets/21171f99-2c10-433c-9226-b34db68c408c
 ##### Uma frase (diversos bytes), para ver como ficaria a visualização
 https://github.com/user-attachments/assets/76392037-8c7b-4c7f-b78e-afd91f21c2c0
 
+
 #### Demo - Encoder=Manchester, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
 ##### Um caractere (apenas um byte), para melhor visualização
-https://github.com/user-attachments/assets/8fdbfd61-b06b-44f5-9181-279ee261e09b
+https://github.com/user-attachments/assets/cf55d296-f491-47b7-ae4d-4033daf5c6c6
 ##### Uma frase (diversos bytes), para ver como ficaria a visualização
-
+https://github.com/user-attachments/assets/86c000d8-08e7-41cc-941a-695d9cff2378
 
 
 #### Demo - Encoder=AMI Bipolar, Modulator=QPSK, Noise=AWGN (apenas um byte, para melhor visualização)
 tbd
+
 
 #### Demo - Encoder=AMI Bipolar, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
 tbd
