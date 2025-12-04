@@ -178,6 +178,7 @@ https://github.com/user-attachments/assets/76392037-8c7b-4c7f-b78e-afd91f21c2c0
 #### Demo - Encoder=Manchester, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
 ##### Um caractere (apenas um byte), para melhor visualização
 https://github.com/user-attachments/assets/8fdbfd61-b06b-44f5-9181-279ee261e09b
+##### Uma frase (diversos bytes), para ver como ficaria a visualização
 
 
 
