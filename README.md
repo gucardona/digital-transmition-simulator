@@ -176,11 +176,15 @@ https://github.com/user-attachments/assets/21171f99-2c10-433c-9226-b34db68c408c
 https://github.com/user-attachments/assets/76392037-8c7b-4c7f-b78e-afd91f21c2c0
 
 
+
+
 #### Demo - Encoder=Manchester, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
 ##### Um caractere (apenas um byte), para melhor visualização
 https://github.com/user-attachments/assets/cf55d296-f491-47b7-ae4d-4033daf5c6c6
 ##### Uma frase (diversos bytes), para ver como ficaria a visualização
 https://github.com/user-attachments/assets/86c000d8-08e7-41cc-941a-695d9cff2378
+
+
 
 
 #### Demo - Encoder=AMI Bipolar, Modulator=QPSK, Noise=AWGN (apenas um byte, para melhor visualização)
@@ -190,11 +194,15 @@ https://github.com/user-attachments/assets/9e28fcf4-04aa-4e6f-a3e7-9990480748d4
 https://github.com/user-attachments/assets/0ae3853b-68e3-46d8-909b-20e23bf6088a
 
 
+
+
 #### Demo - Encoder=AMI Bipolar, Modulator=QAM64, Noise=AWGN (apenas um byte, para melhor visualização)
 ##### Um caractere (apenas um byte), para melhor visualização
 https://github.com/user-attachments/assets/525cfbee-10ee-4162-b6b1-7fce582762a6
 ##### Uma frase (diversos bytes), para ver como ficaria a visualização
 https://github.com/user-attachments/assets/ba55733d-45bb-4c3e-9d08-708e02f8d388
+
+Interessante notar que neste caso o ruído realmente afetou a mensagem final!
 
 ---
 
