@@ -96,11 +96,13 @@ O simulador implementa o fluxo completo de transmissão digital:
 - Cada bit é representado por uma transição
   - Bit 0: LOW → HIGH (transição ascendente)
   - Bit 1: HIGH → LOW (transição descendente)
+<img width="850" height="382" alt="image" src="https://github.com/user-attachments/assets/30999f2b-9efa-4ef3-9ef8-efc6d0af9342" />
 
 #### **AMI Bipolar Encoder**
 - Usa três níveis de tensão
   - Bit 0: Nível 0
   - Bit 1: Alterna entre +1 e -1
+<img width="1200" height="470" alt="image" src="https://github.com/user-attachments/assets/13916e7e-40a7-4271-8477-feb2110fa38a" />
 
 ### 2. Modulação Digital
 
